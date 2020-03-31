@@ -17,7 +17,8 @@ const Cliente = new Operacoes("cliente");
 
 const resolvers = {
   Query: {
-    status: () => "Servidor rodando!"
+    status: () => "Servidor rodando!",
+    clientes: () => Cliente.lista()
   },
   Mutation: {
     adicionarCliente: (root, params) => Cliente.adiciona(params)
