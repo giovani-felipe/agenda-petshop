@@ -31,10 +31,10 @@ class Cliente {
     return executaQuery(sql).then(() => novoItem);
   }
 
-  deleta(id) {
+  deleta({ id }) {
     const sql = `DELETE FROM Clientes WHERE id=${id}`;
 
-    return executaQuery(sql);
+    return executaQuery(sql).then(() => id);
   }
 }
 
