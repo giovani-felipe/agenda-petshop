@@ -23,10 +23,25 @@ class Pet {
     );
   }
 
-  buscaPorId(res, id) {
-    const sql = `SELECT * FROM Pets WHERE id=${parseInt(id)}`;
+  buscaPorId(id) {
+    const sql = `SELECT Pets.id, Pets.nome, Pets.tipo, 
+      Pets.observacoes, Clientes.id AS donoId,
+      Clientes.nome AS donoNome, Clientes.cpf AS donoCpf
+      FROM Pets INNER JOIN Clientes WHERE Pets.id=${parseInt(
+        id
+      )} AND Clientes.id = Pets.donoId`;
 
-    executaQuery(res, sql);
+    return executaQuery(sql).then(pet => ({
+      id: pet[0].id,
+      nome: pet[0].nome,
+      tipo: pet[0].tipo,
+      observacoes: pet[0].observacoes,
+      dono: {
+        id: pet[0].donoId,
+        nome: pet[0].donoNome,
+        cpf: pet[0].donoCpf
+      }
+    }));
   }
 
   adiciona(item) {
@@ -43,18 +58,26 @@ class Pet {
     }));
   }
 
-  atualiza(res, novoItem, id) {
-    const { nome, dono, tipo, observacoes } = item;
+  atualiza(novoItem) {
+    const { id, nome, donoId, tipo, observacoes } = novoItem;
 
-    const sql = `UPDATE Pets SET nome='${nome}', donoId=${dono}, tipo='${tipo}', observacoes='${observacoes}' WHERE id=${id}`;
+    const sql = `UPDATE Pets SET nome='${nome}', donoId=${donoId}, tipo='${tipo}', observacoes='${observacoes}' WHERE id=${id};SELECT * FROM Clientes WHERE id=${donoId}`;
 
-    executaQuery(res, sql);
+    return executaQuery(sql).then(result => {
+      console.log(result);
+      const dono = result[1][0];
+
+      return {
+        ...novoItem,
+        dono
+      };
+    });
   }
 
-  deleta(res, id) {
+  deleta(id) {
     const sql = `DELETE FROM Pets WHERE id=${id}`;
 
-    executaQuery(res, sql);
+    return executaQuery(sql).then(() => id);
   }
 }
 
